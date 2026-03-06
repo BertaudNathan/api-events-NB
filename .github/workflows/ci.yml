@@ -1,4 +1,4 @@
-name: CI
+name: Pipeline CI (Lint, Build & Test)
 
 on:
   push:
