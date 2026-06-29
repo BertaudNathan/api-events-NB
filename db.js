@@ -1,8 +1,17 @@
 const { Pool } = require('pg');
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/events'
-});
+let pool;
+
+if (process.env.DATABASE_URL) {
+    // CI ou production : vraie base PostgreSQL
+    pool = new Pool({ connectionString: process.env.DATABASE_URL });
+} else {
+    // Local sans Postgres : base en mémoire via pg-mem
+    const { newDb } = require('pg-mem');
+    const memDb = newDb();
+    const adapter = memDb.adapters.createPg();
+    pool = new adapter.Pool();
+}
 
 const initDB = () => pool.query(`
     CREATE TABLE IF NOT EXISTS events (
