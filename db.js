@@ -1,19 +1,18 @@
-const Database = require('better-sqlite3');
-const path = require('path');
+const { Pool } = require('pg');
 
-// En mode test, on utilise une base en mémoire (isolée, sans fichier)
-const dbPath = process.env.NODE_ENV === 'test'
-    ? ':memory:'
-    : path.join(__dirname, 'events.db');
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/events'
+});
 
-const db = new Database(dbPath);
-
-db.exec(`
+const initDB = () => pool.query(`
     CREATE TABLE IF NOT EXISTS events (
-        id    INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT    NOT NULL,
-        date  TEXT    NOT NULL
+        id           SERIAL  PRIMARY KEY,
+        title        TEXT    NOT NULL,
+        date         TEXT    NOT NULL,
+        lieu         TEXT    NOT NULL,
+        categorie    TEXT    NOT NULL,
+        participants INTEGER NOT NULL
     )
 `);
 
-module.exports = db;
+module.exports = { pool, initDB };
