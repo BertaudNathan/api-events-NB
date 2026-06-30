@@ -4,7 +4,10 @@ let pool;
 
 if (process.env.DATABASE_URL) {
     // CI ou production : vraie base PostgreSQL
-    pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    });
 } else if (process.env.NODE_ENV === 'test') {
     // Tests locaux sans Postgres : base en mémoire via pg-mem
     const { newDb } = require('pg-mem');
